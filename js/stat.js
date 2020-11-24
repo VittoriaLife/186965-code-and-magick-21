@@ -2,44 +2,67 @@
 
 const CLOUD_WIDTH = 420;
 const CLOUD_HEIGHT = 270;
+const CLOUD_X = 100;
+const CLOUD_Y = 10;
+const GAP = 20;
+const BAR_HEIGHT = 150;
+const BAR_WIDTH = 40;
+const BAR_GAP = 50;
+const FONT_SIZE = 16;
+const TEXT_WIDTH = 40;
+const barHeight = CLOUD_HEIGHT - GAP - TEXT_WIDTH - GAP;
+const PLAYER_COLOR = 'rgba(255, 0, 0, 1)';
 
-
-let renderCloud = (ctx, x, y, color) => {
+// функция для отрисовки белого окна и тени
+const renderCloud = (ctx, x, y, color) => {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
 };
 
-window.renderStatistics = function (ctx, names, times) {
-  renderCloud(ctx, 110, 20, `rgba(0, 0, 0, 0.7)`);
-  renderCloud(ctx, 100, 10, `#fff`);
+// функция для нахождения максимального результата времени
+const getMaxElement = (arr) => {
+  var maxElement = arr[0];
 
-  ctx.font = `16px PT Mono`;
-  ctx.fillStyle = `#000`;
-  ctx.fillText(`Ура вы победили!`, 50, 50);
+  // Если на какой-нибудь из итераций цикла текущий элемент окажется больше максимального, заменим им максимальный элемент и продолжим поиски. Так, после работы алгоритма, в переменной maxElement будет находиться элемент больше которого в массиве не оказалось никакого элемента.
 
-
-  ctx.fillStyle = '#000';
-  ctx.fillText('Вы', 110, 75);
-  ctx.fillRect(160, 60, 430, 20);
-
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] > maxElement) {
+      maxElement = arr[i];
+    }
+  }
+  return maxElement;
 };
 
-/*
+window.renderStatistics = (ctx, players, times) => {
+  renderCloud(ctx, CLOUD_X + CLOUD_Y, CLOUD_Y * 2, 'rgba(0, 0, 0, 0.7)');
+  renderCloud(ctx, CLOUD_X, CLOUD_Y, '#fff');
 
-На облаке должен быть отрисован текст сообщения ’Ура вы победили! \nСписок результатов: ’ с помощью метода fillText. Текст должен быть набран шрифтом PT Mono размером 16px.
-Обратите внимание. Особенностью отрисовки текста на канвасе является то, что он не поддерживает перенос, поэтому каждая новая строчка должна быть отрисована новым вызовом метода fillText или strokeText.
+  // текс
+  ctx.fillStyle = '#000';
+  ctx.font = '16px PT Mono';
+  ctx.fillText('Ура вы победили!', CLOUD_X + TEXT_WIDTH + CLOUD_Y, CLOUD_Y + 15);
+  ctx.fillText('Список результатов:', CLOUD_X + TEXT_WIDTH + CLOUD_Y, CLOUD_Y + GAP + 10);
 
-После сообщения о победе должна располагаться гистограмма времён участников. Параметры гистограммы следующие:
-Высота гистограммы 150px.
-Ширина колонки 40px.
-Расстояние между колонками 50px.
-Цвет колонки игрока Вы rgba(255, 0, 0, 1).
-Цвет колонок других игроков — синий, а насыщенность задаётся случайным образом.
-Времена игроков располагаются над колонками.
-Имена игроков — под колонками гистограммы.
-Обратите внимание. В rgba последний параметр — это прозрачность, а не насыщенность. Поэтому для задания цвета колонок других игроков нужно использовать hsl. Для перевода цветов из rgba в hsl вы можете использовать, например, вот этот конвертер, там же можно вспомнить особенности разных цветовых форматов или пересмотреть часть про операции с цветом в лекции «Препроцессоры и автоматизация» курса «HTML и CSS. Адаптивная вёрстка и автоматизация».
+  let maxTime = getMaxElement(times);
 
-Обратите внимание. Функцию отрисовки статистики вызывать не надо. Её будет вызывать непосредственно сама игра из файла js/game.js.
+  // функция для возврата рандомного цвета
 
-Обратите внимание. Время прохождения игры должно быть округлено к целому числу.
-*/
+  const getRandomNumber = (max) => {
+    return Math.floor(Math.random() * Math.floor(max));
+  };
+
+  const getRandomColor = () => {
+    return 'hsl(244,' + getRandomNumber(100) + '%, 50%)';
+  };
+
+  // цикл для отрисовки каждой гистограммы
+  for (let i = 0; i < players.length; i++) {
+    ctx.fillStyle = '#000';
+    ctx.fillText(Math.round(times[i]), CLOUD_X + CLOUD_Y + GAP + (BAR_GAP + BAR_WIDTH) * i, (CLOUD_X - FONT_SIZE + GAP) + (BAR_HEIGHT - (barHeight * times[i]) / maxTime) - 5);
+    ctx.fillText(players[i], CLOUD_X + CLOUD_Y + GAP + (BAR_GAP + BAR_WIDTH) * i, CLOUD_X + BAR_HEIGHT + GAP);
+
+    ctx.fillStyle = players[i] === 'Вы' ? PLAYER_COLOR : getRandomColor();
+    ctx.fillRect(CLOUD_X + CLOUD_Y + GAP + (BAR_GAP + BAR_WIDTH) * i, (CLOUD_X - FONT_SIZE + GAP) + (BAR_HEIGHT - (barHeight * times[i]) / maxTime),
+        BAR_WIDTH, (barHeight * times[i]) / maxTime);
+  }
+};
