@@ -22,18 +22,18 @@ const renderWizards = () => {
       name: getRandomNumber(wizardsNames) + ' ' + getRandomNumber(wizardsSurnames),
       coatColor: getRandomNumber(wizardsCoatsColors),
       eyesColor: getRandomNumber(wizardsEyesColors)
-    })
+    });
   }
 };
 
 renderWizards();
 
-const renderSimilarWizards = (wizards) => {
+const renderSimilarWizards = (wizardItem) => {
   let wizardElement = similarWizardTemplate.cloneNode(true);
 
-  wizardElement.querySelector('.setup-similar-label').textContent = wizards.name;
-  wizardElement.querySelector('.wizard-coat').style.fill = wizards.coatColor;
-  wizardElement.querySelector('.wizard-eyes').style.fill = wizards.eyesColor;
+  wizardElement.querySelector('.setup-similar-label').textContent = wizardItem.name;
+  wizardElement.querySelector('.wizard-coat').style.fill = wizardItem.coatColor;
+  wizardElement.querySelector('.wizard-eyes').style.fill = wizardItem.eyesColor;
 
   return wizardElement;
 };
